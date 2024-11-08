@@ -14,7 +14,7 @@ module tt_um_lif_network_MR (
 );
 
     // Assign unused outputs to 0
-    assign uio_out[6:0] = 0;
+    assign uio_out[3:0] = 0;
     assign uio_oe = 8'hFF;       // Set all uio outputs as active high
 
     // Prevent warnings by marking unused inputs
