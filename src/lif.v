@@ -22,7 +22,7 @@ module lif(
     end
 
     // Leaky integration: add current and decay state
-    assign NS = current + (state >> 1);
+    assign NS = current; //+ (state >> 1);
 
     // Generate spike when state reaches or exceeds the threshold
     assign spike = (state >= threshold); 
