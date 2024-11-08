@@ -2,7 +2,7 @@
 
 module lif_neuron_network(
     input wire clk,                           // Clock signal
-    input wire reset,                         // Reset signal
+    input wire reset,                         // Active-low reset signal
     input wire [4:0] external_input_1,        // 5-bit input for Neuron 1
     input wire [4:0] external_input_2,        // 5-bit input for Neuron 2
     input wire [4:0] external_input_3,        // 5-bit input for Neuron 3
@@ -30,12 +30,13 @@ module lif_neuron_network(
     lif output_neuron (.current(input_current_output), .clk(clk), .reset(reset), .state(), .spike(spike_output));
 
     // Generate the input current for the output neuron based on spikes from the input neurons
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
+    always @(posedge clk or negedge reset) begin
+        if (!reset) begin
             input_current_output <= 5'd0;
         end else begin
-            // If an input neuron spikes, add its weighted contribution to the output neuron's input current
-            input_current_output <= (spike_out_1 ? weight_1_to_output : 5'd0) +
+            // Accumulate input contributions based on spike pulses
+            input_current_output <= input_current_output +
+                                    (spike_out_1 ? weight_1_to_output : 5'd0) +
                                     (spike_out_2 ? weight_2_to_output : 5'd0) +
                                     (spike_out_3 ? weight_3_to_output : 5'd0);
         end

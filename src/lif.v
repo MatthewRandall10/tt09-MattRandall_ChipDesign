@@ -3,7 +3,7 @@
 module lif(
     input wire [4:0] current,      // 5-bit input current
     input wire clk,                // Clock signal
-    input wire reset,              // Reset signal
+    input wire reset,              // Active-low reset signal
     output reg [4:0] state,        // 5-bit membrane potential state
     output reg spike               // Spike output
 );
@@ -12,16 +12,19 @@ module lif(
     wire [4:0] NS;                 // Next state (membrane potential)
     reg [4:0] threshold;           // Threshold for firing
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk or negedge reset) begin
         if (!reset) begin
             state <= 5'd0;         // Reset state to 0
             threshold <= 5'd15;    // Set threshold (can be parameterized)
             spike <= 0;            // Reset spike output
         end else begin
             state <= NS;           // Update state to next state
-            spike <= (NS >= threshold); // Set spike if threshold is crossed
+            // Generate a single-cycle spike when NS crosses the threshold
             if (NS >= threshold) begin
+                spike <= 1;
                 state <= 5'd0;     // Reset state after firing
+            end else begin
+                spike <= 0;        // Clear spike after the pulse
             end
         end    
     end

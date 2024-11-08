@@ -26,14 +26,14 @@ module tt_um_lif_network_MR (
     // Instantiate the lif_neuron_network module
     lif_neuron_network lif_net (
         .clk(clk),
-        .reset(rst_n),                    // Active-high reset
-        .external_input_1(ui_in[4:0]),     // Use the lower 5 bits of ui_in for Neuron 1
-        .external_input_2(ui_in[4:0]),     // For testing, input the same signal to all neurons
-        .external_input_3(ui_in[4:0]),     // Adjust as needed for different signals
-        .spike_1(spike_out_1),             // Connect spike outputs to internal signals
+        .reset(!rst_n),                   // Correct for active-low reset
+        .external_input_1(ui_in[4:0]),    // Use the lower 5 bits of ui_in for Neuron 1
+        .external_input_2(ui_in[4:0]),    // For testing, input the same signal to all neurons
+        .external_input_3(ui_in[4:0]),    // Adjust as needed for different signals
+        .spike_1(spike_out_1),            // Connect spike outputs to internal signals
         .spike_2(spike_out_2),
         .spike_3(spike_out_3),
-        .spike_output(spike_out_final)     // Final spike output
+        .spike_output(spike_out_final)    // Final spike output
     );
 
     // Use the final spike output in uio_out[7] for observation

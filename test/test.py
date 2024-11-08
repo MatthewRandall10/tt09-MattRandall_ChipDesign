@@ -1,4 +1,3 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
@@ -26,8 +25,11 @@ async def test_project(dut):
 
     dut._log.info("Beginning test sequence")
 
+    # Define threshold for testing
+    threshold = 15  # Adjust based on your Verilog module threshold
+
     # Test inputs: Apply various values to ui_in and check the output on uo_out and uio_out[7]
-    test_values = [5, 10, 15, 20, 25, 30]  # Example values to test the neuron behavior
+    test_values = [5, 10, threshold, 20, 25, 30]  # Example values to test the neuron behavior
 
     for value in test_values:
         dut.ui_in.value = value            # Set input value
@@ -36,12 +38,10 @@ async def test_project(dut):
         # Log the current output values
         dut._log.info(f"ui_in: {value}, uo_out: {int(dut.uo_out.value)}, spike: {int(dut.uio_out[7].value)}")
 
-        # Example assertion: Adjust this based on expected output behavior
-        # Here we can assert that the spike signal (`uio_out[7]`) goes high
-        # when the neuron threshold is met or exceeded.
-        if value >= 15:  # Adjust threshold as per design
-            assert dut.uio_out[7].value == 1, f"Expected spike for input {value}"
+        # Assertion: Check spike behavior
+        if value >= threshold:
+            assert dut.uio_out[7].value == 1, f"Expected spike for input {value} (threshold: {threshold})"
         else:
-            assert dut.uio_out[7].value == 0, f"Expected no spike for input {value}"
+            assert dut.uio_out[7].value == 0, f"Expected no spike for input {value} (threshold: {threshold})"
 
     dut._log.info("Test sequence completed successfully")
