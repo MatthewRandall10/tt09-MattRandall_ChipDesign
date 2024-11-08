@@ -18,8 +18,15 @@ async def test_individual_neuron_spikes(dut):
     # Define input currents for each neuron to test edge cases around the threshold
     test_cases = [
         (0, 0, 0),  # Below threshold for all neurons
-        (0,0,0),
+        (1,1,1),
+        (2,2,2),
+        (3,3,3),
+        (4,4,4),
+        (5,5,5),
+        (6,6,6),
+        (7,7,7),
         (8, 8, 8),  # At threshold for all neurons
+        (9,9,9),
         (10, 10, 10),  # Above threshold for all neurons
         (6, 4, 9),  # Mixed case around thresholds (testing weights 5, 4, and 3 respectively)
     ]
