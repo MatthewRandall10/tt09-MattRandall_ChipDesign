@@ -31,13 +31,12 @@ module tt_um_lif_network_MR (
     lif_neuron_network lif_net (
         .clk(clk),
         .reset(rst_n),                   
-        .external_input_1(ui_in[3:0]),  // Unique input for Neuron 1
-        .external_input_2(ui_in[3:0]),  // Unique input for Neuron 2
+        .external_input_1(uio_in[3:0]),  // Unique input for Neuron 1
+        .external_input_2(ui_in[7:4]),  // Unique input for Neuron 2
         .external_input_3(ui_in[3:0]),  // Unique input for Neuron 3
         .spike_1(spike_out_1),              
         .spike_2(spike_out_2),
         .spike_3(spike_out_3),
-        .state(final_neuron_state),
         .spike_output(spike_out_final)     
     );
 
@@ -48,6 +47,6 @@ module tt_um_lif_network_MR (
     assign uio_out[4] = spike_out_1;
 
     // Combine individual neuron spike outputs into uo_out for monitoring
-    assign uo_out = {final_neuron_state, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
+    assign uo_out = {4'b0, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
 
 endmodule
