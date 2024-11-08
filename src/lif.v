@@ -15,7 +15,7 @@ module lif(
     always @(posedge clk or negedge reset) begin
         if (!reset) begin
             state <= 5'd0;         // Reset state to 0
-            threshold <= 5'd15;    // Set threshold (can be parameterized)
+            threshold <= 5'd10;    // Set threshold (can be parameterized)
             spike <= 0;            // Reset spike output
         end else begin
             state <= NS;           // Update state to next state

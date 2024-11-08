@@ -24,10 +24,10 @@ async def test_project(dut):
     dut._log.info("Beginning test sequence")
 
     # Define threshold for testing
-    threshold = 15  # Adjust based on your Verilog module threshold
+    threshold = 10570  # Adjust based on your Verilog module threshold
 
     # Test inputs: Apply various values to ui_in and check the output on uo_out and uio_out[7]
-    test_values = [5, 10, 20, 25, 30]  # Extended test values
+    test_values = [10570, 12000, 14000, 15000, 16000]  # Extended test values
 
     for value in test_values:
         dut.ui_in.value = value            # Set input value
