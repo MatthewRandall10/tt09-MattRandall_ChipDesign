@@ -15,9 +15,9 @@ module tt_um_lif_network_MR (
 
     // Set `uio_oe` to 0 for inputs and 1 for outputs
     assign uio_oe = 8'b11110000;  // Lower 4 bits for inputs, upper 4 bits for outputs
-
+    assign uio_out[3:0] = 0;
     // Prevent warnings by marking unused inputs
-    wire _unused = &{ena, 1'b0, uio_in[7:4], uio_out[3:0]};
+    wire _unused = &{ena, 1'b0, uio_in[7:4]};
 
     // Internal wires for spike outputs from neurons in the network
     wire spike_out_1, spike_out_2, spike_out_3, spike_out_final;
