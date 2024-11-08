@@ -28,7 +28,7 @@ module lif_neuron_network(
     lif neuron3 (.current(external_input_3), .clk(clk), .reset(reset), .state(), .spike(spike_out_3));
 
     // Instantiate the output neuron with a 5-bit width
-    lif output_neuron (.current(input_current_output), .clk(clk), .reset(reset), .state(state), .spike(spike_output));
+    lif output_neuron (.current(input_current_output), .clk(clk), .reset(reset), .state(), .spike(spike_output));
 
     // Generate the input current for the output neuron based on spikes from the input neurons
     always @(posedge clk or negedge reset) begin
@@ -39,9 +39,10 @@ module lif_neuron_network(
         input_current_output <= ({4{spike_out_1}} & weight_1_to_output) +
                                 ({4{spike_out_2}} & weight_2_to_output) +
                                 ({4{spike_out_3}} & weight_3_to_output);
+        state = input_current_output;
     end 
     end
-
+    
 
 
     // Assign spike outputs for observation

@@ -3,7 +3,7 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
 @cocotb.test()
-async def test_individual_neuron_spikes(dut):
+async def test_lif_neuron_network(dut):
     # Initialize the clock
     clock = Clock(dut.clk, 10, units="us")  # 100 kHz clock
     cocotb.start_soon(clock.start())
@@ -15,36 +15,28 @@ async def test_individual_neuron_spikes(dut):
     dut.rst_n.value = 1  # Release reset
     dut._log.info("Reset completed")
 
-    # Define input currents for each neuron to test edge cases around the threshold
-    test_cases = [
-        (0, 0, 0),  # Below threshold for all neurons
-        (1,1,1),
-        (2,2,2),
-        (3,3,3),
-        (4,4,4),
-        (5,5,5),
-        (6,6,6),
-        (7,7,7),
-        (8, 8, 8),  # At threshold for all neurons
-        (9,9,9),
-        (10, 10, 10),  # Above threshold for all neurons
-        (6, 4, 9),  # Mixed case around thresholds (testing weights 5, 4, and 3 respectively)
-    ]
+    # Loop over all combinations of inputs from 0 to 10 for each neuron
+    for neuron_input_1 in range(11):
+        for neuron_input_2 in range(11):
+            for neuron_input_3 in range(11):
+                # Apply test currents to each neuron
+                dut.uio_in.value = neuron_input_1               # Input for Neuron 1
+                dut.ui_in.value = (neuron_input_2 << 4) | neuron_input_3  # Neuron 2 in upper bits, Neuron 3 in lower bits
+                await ClockCycles(dut.clk, 5)  # Wait a few cycles for the neuron to process inputs
 
-    for neuron_input_1, neuron_input_2, neuron_input_3 in test_cases:
-        # Apply test currents to each neuron
-        dut.uio_in.value = neuron_input_1               # Input for Neuron 1
-        dut.ui_in.value = (neuron_input_2 << 4) | neuron_input_3  # Neuron 2 in upper bits, Neuron 3 in lower bits
-        await ClockCycles(dut.clk, 5)  # Wait a few cycles for the neuron to process inputs
+                # Read and print spike outputs
+                spike_1 = int(dut.uio_out[4].value)
+                spike_2 = int(dut.uio_out[5].value)
+                spike_3 = int(dut.uio_out[6].value)
+                final_spike = int(dut.uio_out[7].value)
 
-        # Read and print spike outputs
-        spike_1 = int(dut.uio_out[4].value)
-        spike_2 = int(dut.uio_out[5].value)
-        spike_3 = int(dut.uio_out[6].value)
-        final_spike = int(dut.uio_out[7].value)
+                # Read and print the state (final_neuron_state) from the top 4 bits of uo_out
+                uo_out_value = int(dut.uo_out.value)
+                final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
 
-        # Log results
-        dut._log.info(f"Test case - Neuron inputs: N1={neuron_input_1}, N2={neuron_input_2}, N3={neuron_input_3}")
-        dut._log.info(f"Spike outputs: spike_1={spike_1}, spike_2={spike_2}, spike_3={spike_3}, final_spike={final_spike}")
-
-    dut._log.info("Completed test for individual neuron spikes")
+                # Log results
+                dut._log.info(f"Test case - Neuron inputs: N1={neuron_input_1}, N2={neuron_input_2}, N3={neuron_input_3}")
+                dut._log.info(f"Spike outputs: spike_1={spike_1}, spike_2={spike_2}, spike_3={spike_3}, final_spike={final_spike}")
+                dut._log.info(f"Final neuron state (uo_out[7:4]): {final_neuron_state}")
+    
+    dut._log.info("Completed test for lif_neuron_network")
