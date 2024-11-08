@@ -38,7 +38,10 @@ async def test_lif_neuron_network(dut):
                 spike_2 = int(dut.uio_out[5].value)
                 spike_3 = int(dut.uio_out[6].value)
                 final_spike = int(dut.uio_out[7].value)
-                final_neuron_state = int(dut.uo_out[7:4].value)
+                
+                # Extract the final neuron state (bits [7:4] of uo_out)
+                uo_out_value = int(dut.uo_out.value)
+                final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
 
                 # Calculate expected output for the neuron inputs based on weights and thresholds
                 # Spike expected when each neuron's input >= weight (threshold check)
