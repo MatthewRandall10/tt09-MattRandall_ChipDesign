@@ -15,31 +15,33 @@ async def test_lif_neuron_network(dut):
     dut.rst_n.value = 1  # Release reset
     dut._log.info("Reset completed")
 
-    # Loop over all combinations of inputs from 0 to 10 for each neuron
-    for neuron_input_1 in range(11):
-        for neuron_input_2 in range(11):
-            for neuron_input_3 in range(11):
-                # Apply test currents to each neuron
-                dut.uio_in.value = neuron_input_1               # Input for Neuron 1
-                dut.ui_in.value = (neuron_input_2 << 4) | neuron_input_3  # Neuron 2 in upper bits, Neuron 3 in lower bits
-                await ClockCycles(dut.clk, 5)  # Wait a few cycles for the neuron to process inputs
+    # Loop over input values from 0 to 10 and apply them to all neuron inputs simultaneously
+    for input_value in range(11):
+        # Apply the same test current to each neuron
+        dut.uio_in.value = input_value  # Input for Neuron 1
+        dut.ui_in.value = (input_value << 4) | input_value  # Neuron 2 in upper bits, Neuron 3 in lower bits
+        await ClockCycles(dut.clk, 5)  # Wait a few cycles for the neuron to process inputs
 
-                # Read and print spike outputs
-                spike_1 = int(dut.uio_out[4].value)
-                spike_2 = int(dut.uio_out[5].value)
-                spike_3 = int(dut.uio_out[6].value)
-                final_spike = int(dut.uio_out[7].value)
+        # Read and print spike outputs and input_current_output
+        spike_1 = int(dut.uio_out[4].value)
+        spike_2 = int(dut.uio_out[5].value)
+        spike_3 = int(dut.uio_out[6].value)
+        final_spike = int(dut.uio_out[7].value)
 
-                # Check for 'x' or 'z' in uo_out before converting to integer
-                if "x" in dut.uo_out.value.binstr or "z" in dut.uo_out.value.binstr:
-                    final_neuron_state = "undefined"
-                else:
-                    uo_out_value = int(dut.uo_out.value)
-                    final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
+        # Check if input_current_output is defined and log it
+        if "x" in dut.lif_net.input_current_output.value.binstr:
+            current_output_value = "undefined"
+        else:
+            current_output_value = int(dut.lif_net.input_current_output.value)
 
-                # Log results
-                dut._log.info(f"Test case - Neuron inputs: N1={neuron_input_1}, N2={neuron_input_2}, N3={neuron_input_3}")
-                dut._log.info(f"Spike outputs: spike_1={spike_1}, spike_2={spike_2}, spike_3={spike_3}, final_spike={final_spike}")
-                dut._log.info(f"Final neuron state (uo_out[7:4]): {final_neuron_state}")
-    
+        # Read and print the state (final_neuron_state) from the top 4 bits of uo_out
+        uo_out_value = int(dut.uo_out.value)
+        final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
+
+        # Log results
+        dut._log.info(f"Test case - Neuron input: {input_value}")
+        dut._log.info(f"Spike outputs: spike_1={spike_1}, spike_2={spike_2}, spike_3={spike_3}, final_spike={final_spike}")
+        dut._log.info(f"Final neuron state (uo_out[7:4]): {final_neuron_state}")
+        dut._log.info(f"input_current_output value: {current_output_value}")
+
     dut._log.info("Completed test for lif_neuron_network")
