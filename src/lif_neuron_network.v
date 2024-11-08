@@ -17,9 +17,9 @@ module lif_neuron_network(
     reg [4:0] input_current_output;           // 5-bit input for the output neuron
 
     // Weights for synaptic connections from input neurons to the output neuron
-    parameter [4:0] weight_1_to_output = 5'd2;  // Spike weight from Neuron 1 to Output Neuron
-    parameter [4:0] weight_2_to_output = 5'd2;  // Spike weight from Neuron 2 to Output Neuron
-    parameter [4:0] weight_3_to_output = 5'd2;  // Spike weight from Neuron 3 to Output Neuron
+    parameter [4:0] weight_1_to_output = 5'd12;  // Spike weight from Neuron 1 to Output Neuron
+    parameter [4:0] weight_2_to_output = 5'd10;  // Spike weight from Neuron 2 to Output Neuron
+    parameter [4:0] weight_3_to_output = 5'd5;  // Spike weight from Neuron 3 to Output Neuron
 
     // Instantiate the three input neurons with 5-bit width
     lif neuron1 (.current(external_input_1), .clk(clk), .reset(reset), .state(), .spike(spike_out_1));

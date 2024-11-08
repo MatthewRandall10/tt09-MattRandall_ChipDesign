@@ -1,5 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
@@ -29,7 +27,7 @@ async def test_project(dut):
     threshold = 15  # Adjust based on your Verilog module threshold
 
     # Test inputs: Apply various values to ui_in and check the output on uo_out and uio_out[7]
-    test_values = [5, 10, threshold, 20, 25, 30]  # Example values to test the neuron behavior
+    test_values = [5, 10, threshold, 20, 25, 30]  # Extended test values
 
     for value in test_values:
         dut.ui_in.value = value            # Set input value
