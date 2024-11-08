@@ -21,7 +21,7 @@ async def test_layered_neuron_network(dut):
     dut._log.info("Reset completed")
 
     # Ramp-Up Test for ui_in
-    for value in range(0, 256, 10):  # Increment by 10 up to max 8-bit value
+    for value in range(0, 2000, 10):  # Increment by 10 up to max 8-bit value
         dut.ui_in.value = value
         await ClockCycles(dut.clk, 5)
 

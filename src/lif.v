@@ -21,7 +21,6 @@ module lif(
                 spike <= 1;        // Set spike when NS crosses threshold
                 state <= 5'd0;     // Reset state after firing
             end else begin
-                spike <= 0;        // Clear spike
                 state <= NS;       // Update state to next state
             end
         end    
