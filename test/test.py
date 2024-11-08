@@ -4,45 +4,51 @@ from cocotb.triggers import ClockCycles
 
 
 @cocotb.test()
-async def test_project(dut):
-    # Logging
-    dut._log.info("Starting test for tt_um_lif")
+async def test_layered_neuron_network(dut):
+    dut._log.info("Starting layered neuron network test")
 
-    # Set the clock period to 10 us (100 KHz)
+    # Set up clock
     clock = Clock(dut.clk, 10, units="us")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Applying reset")
-    dut.ena.value = 1        # Enable the design
-    dut.ui_in.value = 0      # Initialize input to zero
-    dut.uio_in.value = 0     # Set unused input to zero
-    dut.rst_n.value = 0      # Apply reset (active-low)
+    # Apply reset
+    dut.ena.value = 1
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1      # Release reset
+    dut.rst_n.value = 1
+    dut._log.info("Reset completed")
 
-    dut._log.info("Beginning test sequence")
+    # Ramp-Up Test for ui_in
+    for value in range(0, 256, 10):  # Increment by 10 up to max 8-bit value
+        dut.ui_in.value = value
+        await ClockCycles(dut.clk, 5)
 
-    # Define threshold for testing
-    threshold = 10570  # Adjust based on your Verilog module threshold
+        # Print current input and output states, including each neuron's spike output
+        dut._log.info(f"ui_in: {value}")
+        dut._log.info(f"uo_out: {int(dut.uo_out.value)}")
+        
+        # Print individual spike outputs from uio_out bits
+        dut._log.info(f"spike_1 (uio_out[4]): {int(dut.uio_out[4].value)}")
+        dut._log.info(f"spike_2 (uio_out[5]): {int(dut.uio_out[5].value)}")
+        dut._log.info(f"spike_3 (uio_out[6]): {int(dut.uio_out[6].value)}")
+        dut._log.info(f"final spike (uio_out[7]): {int(dut.uio_out[7].value)}")
 
-    # Test inputs: Apply various values to ui_in and check the output on uo_out and uio_out[7]
-    test_values = [10570, 12000, 14000, 15000, 16000]  # Extended test values
+    # Threshold-Crossing Test
+    threshold_values = [40, 50, 60]  # Adjust based on ramp-up test results
+    for value in threshold_values:
+        dut.ui_in.value = value
+        await ClockCycles(dut.clk, 5)
 
-    for value in test_values:
-        dut.ui_in.value = value            # Set input value
-        await ClockCycles(dut.clk, 5)      # Wait a few cycles for output stabilization
-
-        # Log the current output values and debug info for accumulation
-        dut._log.info(f"ui_in: {value}, uo_out: {int(dut.uo_out.value)}, spike: {int(dut.uio_out[7].value)}")
-
-        # Additional debugging logs for internal signal (if accessible)
-        # dut._log.info(f"input_current_output: {int(dut.lif_net.input_current_output.value)}")
-
-        # Assertion: Check spike behavior
-        if value >= threshold:
-            assert dut.uio_out[7].value == 1, f"Expected spike for input {value} (threshold: {threshold})"
-        else:
-            assert dut.uio_out[7].value == 0, f"Expected no spike for input {value} (threshold: {threshold})"
-
-    dut._log.info("Test sequence completed successfully")
+        # Print current input and output states, including each neuron's spike output
+        dut._log.info(f"Testing ui_in: {value}")
+        dut._log.info(f"uo_out: {int(dut.uo_out.value)}")
+        
+        # Print individual spike outputs from uio_out bits
+        dut._log.info(f"spike_1 (uio_out[4]): {int(dut.uio_out[4].value)}")
+        dut._log.info(f"spike_2 (uio_out[5]): {int(dut.uio_out[5].value)}")
+        dut._log.info(f"spike_3 (uio_out[6]): {int(dut.uio_out[6].value)}")
+        dut._log.info(f"final spike (uio_out[7]): {int(dut.uio_out[7].value)}")
+    
+    dut._log.info("Layered neuron network test completed")

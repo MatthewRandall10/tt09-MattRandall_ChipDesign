@@ -38,6 +38,9 @@ module tt_um_lif_network_MR (
 
     // Use the final spike output in uio_out[7] for observation
     assign uio_out[7] = spike_out_final;
+    assign uio_out[6] = spike_out_3;
+    assign uio_out[5] = spike_out_2;
+    assign uio_out[4] = spike_out_3;
 
     // Combine individual neuron spike outputs into uo_out for monitoring
     assign uo_out = {4'b0000, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
