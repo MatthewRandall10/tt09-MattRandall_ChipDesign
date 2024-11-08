@@ -36,14 +36,10 @@ module lif_neuron_network(
         input_current_output <= 4'd0;  // Ensure full reset on reset
     end else if (spike_out_1 || spike_out_2 || spike_out_3) begin
         // Accumulate contributions only when there is a spike from any input neuron
-        input_current_output <= input_current_output +
-                                (spike_out_1 ? weight_1_to_output : 4'd0) +
-                                (spike_out_2 ? weight_2_to_output : 4'd0) +
-                                (spike_out_3 ? weight_3_to_output : 4'd0);
-    end else begin
-        // No spikes from input neurons, fully reset input_current_output
-        input_current_output <= 4'd0;
-    end
+        input_current_output <= ({4{spike_out_1}} & weight_1_to_output) +
+                                ({4{spike_out_2}} & weight_2_to_output) +
+                                ({4{spike_out_3}} & weight_3_to_output);
+    end 
     end
 
 
