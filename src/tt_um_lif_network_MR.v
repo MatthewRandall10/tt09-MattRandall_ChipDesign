@@ -23,17 +23,17 @@ module tt_um_lif_network_MR (
     wire spike_out_1, spike_out_2, spike_out_3, spike_out_final;
 
     // Split `ui_in` and `uio_in` into separate inputs for each neuron
-    wire [3:0] neuron_input_1 = uio_in[3:0];      // Lower 5 bits of uio_in for Neuron 1
-    wire [3:0] neuron_input_2 = ui_in[7:4];       // Lower 5 bits of ui_in for Neuron 2
-    wire [3:0] neuron_input_3 = ui_in[3:0];       // Upper bits of ui_in for Neuron 3
+    // wire [3:0] neuron_input_1 = uio_in[3:0];      // Lower 5 bits of uio_in for Neuron 1
+    // wire [3:0] neuron_input_2 = ui_in[7:4];       // Lower 5 bits of ui_in for Neuron 2
+    // wire [3:0] neuron_input_3 = ui_in[3:0];       // Upper bits of ui_in for Neuron 3
     reg [3:0] final_neuron_state;
     // Instantiate the lif_neuron_network module with unique inputs for each neuron
     lif_neuron_network lif_net (
         .clk(clk),
         .reset(rst_n),                   
-        .external_input_1(neuron_input_1),  // Unique input for Neuron 1
-        .external_input_2(neuron_input_2),  // Unique input for Neuron 2
-        .external_input_3(neuron_input_3),  // Unique input for Neuron 3
+        .external_input_1(ui_in[3:0]),  // Unique input for Neuron 1
+        .external_input_2(ui_in[3:0]),  // Unique input for Neuron 2
+        .external_input_3(ui_in[3:0]),  // Unique input for Neuron 3
         .spike_1(spike_out_1),              
         .spike_2(spike_out_2),
         .spike_3(spike_out_3),
