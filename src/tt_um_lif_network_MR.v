@@ -14,7 +14,7 @@ module tt_um_lif_network_MR (
 );
 
     // Assign unused outputs to 0
-    assign uio_out[3:0] = 0;
+    assign uio_out[6:5] = 0;
     assign uio_oe = 8'hFF;       // Set all uio outputs as active high
 
     // Prevent warnings by marking unused inputs
@@ -23,24 +23,25 @@ module tt_um_lif_network_MR (
     // Internal wires for spike outputs from neurons in the network
     wire spike_out_1, spike_out_2, spike_out_3, spike_out_final;
 
-    // Instantiate the lif_neuron_network module
-    lif_neuron_network lif_net (
-        .clk(clk),
-        .reset(!rst_n),                   // Correct for active-low reset
-        .external_input_1(ui_in[4:0]),    // Use the lower 5 bits of ui_in for Neuron 1
-        .external_input_2(ui_in[4:0]),    // For testing, input the same signal to all neurons
-        .external_input_3(ui_in[4:0]),    // Adjust as needed for different signals
-        .spike_1(spike_out_1),            // Connect spike outputs to internal signals
-        .spike_2(spike_out_2),
-        .spike_3(spike_out_3),
-        .spike_output(spike_out_final)    // Final spike output
-    );
+    lif test_lif(.current(ui_in[4:0]), .clk(clk), .reset(rst_n), .state(uio_out[4:0]), .spike(spike_out_1));
+
+    // // Instantiate the lif_neuron_network module
+    // lif_neuron_network lif_net ()
+    //     .clk(clk),
+    //     .reset(!rst_n),                   // Correct for active-low reset
+    //     .external_input_1(ui_in[4:0]),    // Use the lower 5 bits of ui_in for Neuron 1
+    //     .external_input_2(ui_in[4:0]),    // For testing, input the same signal to all neurons
+    //     .external_input_3(ui_in[4:0]),    // Adjust as needed for different signals
+    //     .spike_1(spike_out_1),            // Connect spike outputs to internal signals
+    //     .spike_2(spike_out_2),
+    //     .spike_3(spike_out_3),
+    //     .spike_output(spike_out_final)    // Final spike output
+    // );
 
     // Use the final spike output in uio_out[7] for observation
-    assign uio_out[7] = spike_out_final;
-    assign uio_out[6] = spike_out_3;
-    assign uio_out[5] = spike_out_2;
-    assign uio_out[4] = spike_out_3;
+    assign uio_out[7] = spike_out_1;
+
+    
 
     // Combine individual neuron spike outputs into uo_out for monitoring
     assign uo_out = {4'b0000, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
