@@ -33,18 +33,19 @@ module lif_neuron_network(
     // Generate the input current for the output neuron based on spikes from the input neurons
     always @(posedge clk or negedge reset) begin
     if (!reset) begin
-        input_current_output <= 4'd0;
+        input_current_output <= 4'd0;  // Ensure full reset on reset
     end else if (spike_out_1 || spike_out_2 || spike_out_3) begin
-        // Only accumulate when there is a spike from any input neuron
+        // Accumulate contributions only when there is a spike from any input neuron
         input_current_output <= input_current_output +
                                 (spike_out_1 ? weight_1_to_output : 4'd0) +
                                 (spike_out_2 ? weight_2_to_output : 4'd0) +
                                 (spike_out_3 ? weight_3_to_output : 4'd0);
     end else begin
-        // Decay or reset if no spikes are present
-        input_current_output <= 4'd0;  // Or you could implement gradual decay here
+        // No spikes from input neurons, fully reset input_current_output
+        input_current_output <= 4'd0;
     end
-end
+    end
+
 
 
     // Assign spike outputs for observation
