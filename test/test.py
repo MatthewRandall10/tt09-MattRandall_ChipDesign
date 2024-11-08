@@ -30,9 +30,12 @@ async def test_lif_neuron_network(dut):
                 spike_3 = int(dut.uio_out[6].value)
                 final_spike = int(dut.uio_out[7].value)
 
-                # Read and print the state (final_neuron_state) from the top 4 bits of uo_out
-                uo_out_value = int(dut.uo_out.value)
-                final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
+                # Check for 'x' or 'z' in uo_out before converting to integer
+                if "x" in dut.uo_out.value.binstr or "z" in dut.uo_out.value.binstr:
+                    final_neuron_state = "undefined"
+                else:
+                    uo_out_value = int(dut.uo_out.value)
+                    final_neuron_state = (uo_out_value >> 4) & 0xF  # Extract bits [7:4]
 
                 # Log results
                 dut._log.info(f"Test case - Neuron inputs: N1={neuron_input_1}, N2={neuron_input_2}, N3={neuron_input_3}")
