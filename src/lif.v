@@ -1,18 +1,18 @@
 module lif(
-    input wire [4:0]    current,
+    input wire [3:0]    current,
     input wire  clk,
     input wire reset,
-    output reg [4:0] state,
+    output reg [3:0] state,
     output wire spike
 );
 
-    wire [4:0] NS;
-    reg [4:0] threshold;
+    wire [3:0] NS;
+    reg [3:0] threshold;
 
     always @(posedge clk) begin
         if (!reset) begin
             state <= 0;
-            threshold <= 10;
+            threshold <= 8;
         end else begin
             state <= NS;
         end    

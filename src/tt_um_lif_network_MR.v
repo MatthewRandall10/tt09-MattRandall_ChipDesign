@@ -5,7 +5,7 @@
 module tt_um_lif_network_MR (
     input  wire [7:0] ui_in,     // Dedicated inputs
     output wire [7:0] uo_out,    // Dedicated outputs
-    input  wire [7:0] uio_in,    // IOs: Input path
+    input  wire [7:0] uio_in,    // IOs: Input path for neuron inputs
     output wire [7:0] uio_out,   // IOs: Output path
     output wire [7:0] uio_oe,    // IOs: Enable path (active high: 0=input, 1=output)
     input  wire       ena,       // always 1 when the design is powered, so you can ignore it
@@ -13,36 +13,41 @@ module tt_um_lif_network_MR (
     input  wire       rst_n      // reset_n - low to reset
 );
 
-    // Assign unused outputs to 0
-    assign uio_out[3:0] = 0;
-    assign uio_oe = 8'hFF;       // Set all uio outputs as active high
+    // Set `uio_oe` to 0 for inputs and 1 for outputs
+    assign uio_oe = 8'b11110000;  // Lower 4 bits for inputs, upper 4 bits for outputs
 
     // Prevent warnings by marking unused inputs
-    wire _unused = &{ena, uio_in, 1'b0};
+    wire _unused = &{ena, 1'b0};
 
     // Internal wires for spike outputs from neurons in the network
     wire spike_out_1, spike_out_2, spike_out_3, spike_out_final;
 
-    // Instantiate the lif_neuron_network module
+    // Split `ui_in` and `uio_in` into separate inputs for each neuron
+    wire [3:0] neuron_input_1 = uio_in[3:0];      // Lower 5 bits of uio_in for Neuron 1
+    wire [3:0] neuron_input_2 = ui_in[7:4];       // Lower 5 bits of ui_in for Neuron 2
+    wire [3:0] neuron_input_3 = ui_in[3:0];       // Upper bits of ui_in for Neuron 3
+    reg [3:0] final_neuron_state;
+    // Instantiate the lif_neuron_network module with unique inputs for each neuron
     lif_neuron_network lif_net (
         .clk(clk),
-        .reset(rst_n),                   // Correct for active-low reset
-        .external_input_1(ui_in[4:0]),    // Use the lower 5 bits of ui_in for Neuron 1
-        .external_input_2(ui_in[4:0]),    // For testing, input the same signal to all neurons
-        .external_input_3(ui_in[4:0]),    // Adjust as needed for different signals
-        .spike_1(spike_out_1),            // Connect spike outputs to internal signals
+        .reset(rst_n),                   
+        .external_input_1(neuron_input_1),  // Unique input for Neuron 1
+        .external_input_2(neuron_input_2),  // Unique input for Neuron 2
+        .external_input_3(neuron_input_3),  // Unique input for Neuron 3
+        .spike_1(spike_out_1),              
         .spike_2(spike_out_2),
         .spike_3(spike_out_3),
-        .spike_output(spike_out_final)    // Final spike output
+        .state(final_neuron_state),
+        .spike_output(spike_out_final)     
     );
 
     // Use the final spike output in uio_out[7] for observation
     assign uio_out[7] = spike_out_final;
     assign uio_out[6] = spike_out_3;
     assign uio_out[5] = spike_out_2;
-    assign uio_out[4] = spike_out_3;
+    assign uio_out[4] = spike_out_1;
 
     // Combine individual neuron spike outputs into uo_out for monitoring
-    assign uo_out = {4'b0000, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
+    assign uo_out = {final_neuron_state, spike_out_3, spike_out_2, spike_out_1, spike_out_final};
 
 endmodule
