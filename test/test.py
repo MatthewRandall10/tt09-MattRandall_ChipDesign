@@ -15,18 +15,22 @@ async def test_lif_neuron_network(dut):
     dut.rst_n.value = 1  # Release reset
     dut._log.info("Reset completed")
 
-    # Test each possible combination for the lower 4 bits (Neuron 3) and upper 4 bits (Neuron 2) of `ui_in`
-    for neuron_2_input in range(16):  # Upper 4 bits (Neuron 2)
-        for neuron_3_input in range(16):  # Lower 4 bits (Neuron 3)
-            # Combine upper 4 bits for Neuron 2 and lower 4 bits for Neuron 3
-            dut.ui_in.value = (neuron_2_input << 4) | neuron_3_input
-            dut.uio_in.value = neuron_3_input  # Assuming uio_in provides input for Neuron 1
-            await ClockCycles(dut.clk, 1)  # Apply for one cycle
-            
-            # Reset inputs after one cycle
-            dut.ui_in.value = 0
-            dut.uio_in.value = 0
-            await ClockCycles(dut.clk, 5)  # Allow time for effects to propagate
+    # Loop over all combinations for Neuron 1, Neuron 2, and Neuron 3 inputs
+    for neuron_1_input in range():  # Neuron 1 (uio_in)
+        for neuron_2_input in range(5):  # Neuron 2 (ui_in upper 4 bits)
+            for neuron_3_input in range(16):  # Neuron 3 (ui_in lower 4 bits)
+                # Set inputs for each neuron
+                dut.uio_in.value = neuron_1_input  # Neuron 1 input
+                dut.ui_in.value = (neuron_2_input << 4) | neuron_3_input  # Neuron 2 in upper 4 bits, Neuron 3 in lower 4 bits
+                await ClockCycles(dut.clk, 1)  # Apply for one cycle
+                
+                # Reset inputs after one cycle
+                dut.ui_in.value = 0
+                dut.uio_in.value = 0
+                await ClockCycles(dut.clk, 5)  # Allow time for effects to propagate
 
+                
+
+                
 
     dut._log.info("Completed exhaustive test for lif_neuron_network")
