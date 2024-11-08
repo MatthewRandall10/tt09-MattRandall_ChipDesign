@@ -10,21 +10,19 @@ module lif(
 
     // Internal signals
     wire [4:0] NS;                 // Next state (membrane potential)
-    reg [4:0] threshold;           // Threshold for firing
+    parameter [4:0] threshold = 5'd10;  // Threshold for firing, set as parameter
 
     always @(posedge clk or negedge reset) begin
         if (!reset) begin
             state <= 5'd0;         // Reset state to 0
-            threshold <= 5'd10;    // Set threshold (can be parameterized)
             spike <= 0;            // Reset spike output
         end else begin
-            state <= NS;           // Update state to next state
-            // Generate a single-cycle spike when NS crosses the threshold
             if (NS >= threshold) begin
-                spike <= 1;
+                spike <= 1;        // Set spike when NS crosses threshold
                 state <= 5'd0;     // Reset state after firing
             end else begin
-                spike <= 0;        // Clear spike after the pulse
+                spike <= 0;        // Clear spike
+                state <= NS;       // Update state to next state
             end
         end    
     end
