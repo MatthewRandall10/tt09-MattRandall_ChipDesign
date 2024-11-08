@@ -10,7 +10,7 @@ module lif(
     wire [3:0] NS;
     reg [3:0] threshold;
 
-    always @(posedge clk or negedge reset) begin
+    always @(posedge clk) begin
         if (!reset) begin
             state <= 0;
             threshold <= 8;
