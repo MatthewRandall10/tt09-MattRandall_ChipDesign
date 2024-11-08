@@ -16,8 +16,8 @@ async def test_lif_neuron_network(dut):
     dut._log.info("Reset completed")
 
     # Loop over all combinations for Neuron 1, Neuron 2, and Neuron 3 inputs
-    for neuron_1_input in range():  # Neuron 1 (uio_in)
-        for neuron_2_input in range(5):  # Neuron 2 (ui_in upper 4 bits)
+    for neuron_1_input in range(16):  # Neuron 1 (uio_in)
+        for neuron_2_input in range(16):  # Neuron 2 (ui_in upper 4 bits)
             for neuron_3_input in range(16):  # Neuron 3 (ui_in lower 4 bits)
                 # Set inputs for each neuron
                 dut.uio_in.value = neuron_1_input  # Neuron 1 input
